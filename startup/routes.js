@@ -5,6 +5,9 @@ const genres = require("../routes/alert");
 const express = require("express");
 module.exports = function(app) {
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+
+  app.use("/uploads", express.static("uploads"));
 
   //api
   app.use("/api/alert", genres);

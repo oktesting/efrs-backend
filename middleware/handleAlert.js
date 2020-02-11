@@ -20,9 +20,20 @@ function closeConnection(response, clientId) {
   }
 }
 
+const fs = require("fs");
+
 module.exports.addAlert = async (req, res, next) => {
   const fire = new Fire(req.body);
-  res.send(await fire.save());
+
+  const evidence = { ...req.file };
+  var img = fs.readFileSync(req.file.path);
+  var encode_image = img.toString("base64");
+  evidence["buffer"] = Buffer.from(encode_image, "base64");
+  fire.evidences.push(evidence);
+
+  // res.send(await fire.save());
+  await fire.save();
+  res.send({ _id: fire._id });
 
   return sendEventsToAll(fire);
 };

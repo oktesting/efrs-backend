@@ -13,6 +13,10 @@ const fireSchema = new mongoose.Schema({
   userId: {
     type: String,
     required: true
+  },
+  evidences: {
+    type: Array,
+    required: false
   }
 });
 
