@@ -1,18 +1,31 @@
-const { addAlert, handleAlert } = require("../middleware/handleAlert");
+const { validateFire } = require("../models/fire");
 const express = require("express");
-const router = express.Router();
+const {
+  addAlert,
+  handleAlert,
+  addEvidencesToCurrentAlert
+} = require("../middleware/handleAlert");
+const validate = require("../middleware/validate");
+const { array } = require("../middleware/upload");
+const validateObjectId = require("../middleware/validateObjectId");
 
-const upload = require("../middleware/upload");
+const router = express.Router();
 
 router.get("/", handleAlert);
 
-const { Fire } = require("../models/fire");
-router.get("/:id", async (req, res) => {
-  const fire = await Fire.findById(req.params.id);
+// const { Fire } = require("../models/fire");
+// router.get("/:id", async (req, res) => {
+//   const fire = await Fire.findById(req.params.id);
 
-  res.send(fire);
-});
+//   res.send(fire);
+// });
 
-router.post("/", [upload("file"), addAlert]);
+router.post("/", [array("files", 3), validate(validateFire), addAlert]);
+
+router.post("/:id", [
+  validateObjectId,
+  array("files", 3),
+  addEvidencesToCurrentAlert
+]);
 
 module.exports = router;

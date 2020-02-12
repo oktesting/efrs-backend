@@ -29,6 +29,10 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
-module.exports = name => {
+module.exports.single = name => {
   return upload.single(name);
+};
+
+module.exports.array = (name, maxCount) => {
+  return upload.array(name, maxCount);
 };

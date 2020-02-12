@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { Fire } = require("../models/fire");
 
 let clients = [];
@@ -12,6 +13,16 @@ function sendEventsToAll(newFire) {
   });
 }
 
+function convertFilesToBinary(req, fire) {
+  req.files.forEach(file => {
+    const evidence = { ...file };
+    var img = fs.readFileSync(file.path);
+    var encode_image = img.toString("base64");
+    evidence["buffer"] = Buffer.from(encode_image, "base64");
+    fire.evidences.push(evidence);
+  });
+}
+
 function closeConnection(response, clientId) {
   if (!response.finished) {
     response.end();
@@ -20,22 +31,20 @@ function closeConnection(response, clientId) {
   }
 }
 
-const fs = require("fs");
-
 module.exports.addAlert = async (req, res, next) => {
   const fire = new Fire(req.body);
-
-  const evidence = { ...req.file };
-  var img = fs.readFileSync(req.file.path);
-  var encode_image = img.toString("base64");
-  evidence["buffer"] = Buffer.from(encode_image, "base64");
-  fire.evidences.push(evidence);
-
-  // res.send(await fire.save());
+  convertFilesToBinary(req, fire);
   await fire.save();
   res.send({ _id: fire._id });
-
   return sendEventsToAll(fire);
+};
+
+module.exports.addEvidencesToCurrentAlert = async (req, res, next) => {
+  const fire = await Fire.findById(req.params.id);
+  if (!fire) return res.status(404).send("not found fire with given id");
+  convertFilesToBinary(req, fire);
+  await fire.save();
+  return res.status(200).send("evidences is submitted");
 };
 
 module.exports.handleAlert = async (req, res, next) => {

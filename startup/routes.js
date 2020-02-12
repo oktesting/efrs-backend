@@ -1,12 +1,13 @@
 //route endpoint
 const genres = require("../routes/alert");
+
 //error is express's middleware function that we implemented to handle error
-// const error = require('../middleware/error');
+const error = require("../middleware/error");
 const express = require("express");
 module.exports = function(app) {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-
+  //set uploads folder as public
   app.use("/uploads", express.static("uploads"));
 
   //api
@@ -18,5 +19,5 @@ module.exports = function(app) {
   //   app.use("/api/auth", auth);
   //   app.use("/api/returns", returns);
 
-  // app.use(error);//handle error after all above middleware
+  app.use(error); //handle error after all above middleware
 };

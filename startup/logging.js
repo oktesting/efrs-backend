@@ -1,6 +1,6 @@
 /*'express-async-errors' module will redirect from route handler 
 middleware to error middleware when exception happens automatically*/
-// require('express-async-errors');
+require("express-async-errors");
 //log the error to logfile.log
 const winston = require("winston"); // this is deprecated version 2.4.0
 //log the error to mongdb
