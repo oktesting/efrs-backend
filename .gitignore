@@ -9,4 +9,4 @@
 /uncaughtExceptions.log
 
 #file uploads
-/uploads/*
+# /uploads/*
