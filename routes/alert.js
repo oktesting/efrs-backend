@@ -6,7 +6,7 @@ const {
   addEvidencesToCurrentAlert
 } = require("../middleware/handleAlert");
 const validate = require("../middleware/validate");
-const { array } = require("../middleware/upload");
+const { array } = require("../middleware/uploadToServer");
 const validateObjectId = require("../middleware/validateObjectId");
 
 const router = express.Router();
