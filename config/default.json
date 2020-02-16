@@ -1,7 +1,7 @@
 {
   "port": "3900",
   "db": "mongodb://localhost/efrs",
-  "aws_id": "AKIAJNSSVZP7JNOM4AAQ",
-  "aws_secret": "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",
+  "aws_id": "AKIAYXFDKX2L6XJIG654",
+  "aws_secret": "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",
   "aws_bucket_name": "efrs"
 }
