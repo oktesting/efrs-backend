@@ -4,5 +4,8 @@
   "aws_id": "AKIAYXFDKX2L6XJIG654",
   "aws_secret": "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",
   "aws_bucket_name": "efrs",
-  "jwtPrivateKey": "changeToEnvironmentVariable"
+  "jwtPrivateKey": "changeToEnvironmentVariable",
+  "email_user": "duccmse06002@fpt.edu.vn",
+  "email_pass": "duc01101998",
+  "base_url": "localhost:3900"
 }

@@ -22,7 +22,11 @@ const userSchema = new mongoose.Schema({
     maxlength: 1024, //after hashed
     minlength: 5
   },
-  isAdmin: Boolean
+  isAdmin: Boolean,
+  isVerified: {
+    type: Boolean,
+    default: false
+  }
 });
 //adding an INSTANCE method to the class User
 userSchema.methods.generateAuthToken = function() {

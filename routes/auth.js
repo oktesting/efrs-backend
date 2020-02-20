@@ -14,8 +14,11 @@ router.post("/", validate(validateAuth), async (req, res) => {
     user.password
   );
   if (isValidPassword) {
-    const token = user.generateAuthToken();
-    return res.send(token);
+    if (!user.isVerified) {
+      return res.status(401).send("your account has not verified");
+    }
+    const jwtToken = user.generateAuthToken();
+    return res.send(jwtToken);
   } else return res.status(400).send("Email or password is incorrect");
 });
 
