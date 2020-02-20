@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const Joi = require("joi");
 const mongoose = require("mongoose");
-const userSchema = new mongoose.Schema({
+const accountSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -28,8 +28,8 @@ const userSchema = new mongoose.Schema({
     default: false
   }
 });
-//adding an INSTANCE method to the class User
-userSchema.methods.generateAuthToken = function() {
+//adding an INSTANCE method to the class Account
+accountSchema.methods.generateAuthToken = function() {
   //cannot use '=>' here bc of 'this._id'
   return jwt.sign(
     {
@@ -41,10 +41,9 @@ userSchema.methods.generateAuthToken = function() {
     config.get("jwtPrivateKey")
   );
 };
-const User = mongoose.model("User", userSchema);
 
-module.exports.User = User;
-module.exports.validateUser = user => {
+module.exports.Account = mongoose.model("Account", accountSchema);
+module.exports.validateAccount = account => {
   const schema = {
     name: Joi.string()
       .min(5)
@@ -60,5 +59,5 @@ module.exports.validateUser = user => {
       .max(255)
       .required()
   };
-  return Joi.validate(user, schema);
+  return Joi.validate(account, schema);
 };

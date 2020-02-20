@@ -3,9 +3,9 @@ const nodemailer = require("nodemailer");
 const config = require("config");
 const { Token } = require("../models/token");
 
-module.exports.sendConfirmationEmail = async user => {
+module.exports.sendConfirmationEmail = async account => {
   const confirmationToken = new Token({
-    userId: user._id,
+    accountId: account._id,
     token: crypto.randomBytes(16).toString("hex")
   });
   await confirmationToken.save();
@@ -18,15 +18,15 @@ module.exports.sendConfirmationEmail = async user => {
   });
   const mailOptions = {
     from: "no-reply@yourwebapplication.com",
-    to: user.email,
+    to: account.email,
     subject: "Account Verification Token",
     text:
       "Hello,\n\n" +
       "Please verify your account by clicking the link: \nhttp://" +
       config.get("base_url") +
-      "/api/users/confirmation/" +
+      "/api/accounts/confirmation/" +
       confirmationToken.token +
-      "\n"
+      "\nThis token will be expires in 12 hours"
   };
   await transporter.sendMail(mailOptions);
 };

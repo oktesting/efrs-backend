@@ -13,8 +13,8 @@ module.exports = function(req, res, next) {
   //get the payload from decoded token
   try {
     const decodedPayload = jwt.verify(token, config.get("jwtPrivateKey"));
-    //set the user._id from payload to req
-    req.user = decodedPayload;
+    //set the account._id from payload to req
+    req.account = decodedPayload;
     next();
   } catch (ex) {
     return res.status(400).send("invalid token");

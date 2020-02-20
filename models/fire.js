@@ -21,6 +21,11 @@ const fireSchema = new mongoose.Schema({
   evidences: {
     type: Array,
     required: false
+  },
+  status: {
+    type: String,
+    default: "pending",
+    enum: ["pending", "processing", "finished"]
   }
 });
 

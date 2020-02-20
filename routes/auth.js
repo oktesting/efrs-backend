@@ -3,21 +3,21 @@ const Joi = require("joi");
 const bcrypt = require("bcrypt");
 const express = require("express");
 const router = express.Router();
-const { User } = require("../models/user");
+const { Account } = require("../models/account");
 
 //login route
 router.post("/", validate(validateAuth), async (req, res) => {
-  let user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("Email or password is incorrect");
+  let account = await Account.findOne({ email: req.body.email });
+  if (!account) return res.status(400).send("Email or password is incorrect");
   const isValidPassword = await bcrypt.compare(
     req.body.password,
-    user.password
+    account.password
   );
   if (isValidPassword) {
-    if (!user.isVerified) {
+    if (!account.isVerified) {
       return res.status(401).send("your account has not verified");
     }
-    const jwtToken = user.generateAuthToken();
+    const jwtToken = account.generateAuthToken();
     return res.send(jwtToken);
   } else return res.status(400).send("Email or password is incorrect");
 });
