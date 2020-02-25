@@ -26,6 +26,14 @@ const accountSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: false
+  },
+  supervisor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Supervisor"
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
   }
 });
 //adding an INSTANCE method to the class Account

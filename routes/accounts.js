@@ -1,11 +1,16 @@
 const bcrypt = require("bcrypt");
 const _ = require("lodash"); //provide utilities for manipulationg object
 const express = require("express");
+const Joi = require("joi");
 const { Account, validateAccount } = require("../models/account");
+const validateOjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validate");
 const auth = require("../middleware/auth");
 const isAdmin = require("../middleware/admin");
-const { sendConfirmationEmail } = require("../middleware/sendEmail");
+const {
+  sendConfirmationEmail,
+  sendResetPasswordMail
+} = require("../middleware/sendEmail");
 const { Token } = require("../models/token");
 
 const router = express.Router();
@@ -23,7 +28,7 @@ router.post("/", validate(validateAccount), async (req, res) => {
   let account = await Account.findOne({ email: req.body.email });
   if (account) return res.status(400).send("this email already registered");
   account = new Account(_.pick(req.body, ["name", "email", "password"]));
-  salt = await bcrypt.genSalt();
+  const salt = await bcrypt.genSalt();
   account.password = await bcrypt.hash(account.password, salt);
   await account.save();
   sendConfirmationEmail(account);
@@ -41,9 +46,7 @@ router.post("/", validate(validateAccount), async (req, res) => {
 router.get("/confirmation/:token", async (req, res) => {
   const confirmationToken = await Token.findOne({ token: req.params.token });
   if (!confirmationToken)
-    return res
-      .status(404)
-      .send("token is not found. your account is not verified");
+    return res.status(404).send("verification token is invalid or expired");
   const account = await Account.findById(confirmationToken.accountId);
   if (!account) return res.status(404).send("account is not found");
   if (account.isVerified)
@@ -54,13 +57,50 @@ router.get("/confirmation/:token", async (req, res) => {
 });
 
 //resend confirmation email
-router.get("/resend/:accountId", async (req, res) => {
-  const account = await Account.findById(req.params.accountId);
+router.get("/resend/:id", validateOjectId, async (req, res) => {
+  const account = await Account.findById(req.params.id);
   if (!account) return res.status(404).send("account is not found");
   if (account.isVerified)
     return res.status(400).send("account is already verified");
   sendConfirmationEmail(account);
   return res.status(200).send("an verification email is sent to your email");
 });
+
+//forget password request
+router.post("/forgot-password", async (req, res) => {
+  if (!req.body.email) return res.status(400).send("email must be provided");
+  const account = await Account.findOne({ email: req.body.email });
+  if (!account) return res.status(404).send("account is not found");
+  sendResetPasswordMail(account);
+  return res.status(200).send("reset password email is sent to your email");
+});
+
+//reset password handled
+router.post("/reset", validate(validateReset), async (req, res) => {
+  const resetToken = await Token.findOne({ token: req.body.token });
+  if (!resetToken)
+    return res.status(404).send("reset token is invalid or expired");
+
+  let account = await Account.findById(resetToken.accountId);
+  if (!account) return res.status(404).send("account is not found");
+
+  const salt = await bcrypt.genSalt();
+  account.password = await bcrypt.hash(req.body.newPassword, salt);
+  await account.save();
+  return res.status(200).send("password is changed successfully");
+});
+
+function validateReset(req) {
+  const schema = {
+    newPassword: Joi.string()
+      .min(5)
+      .max(255)
+      .required(),
+    token: Joi.string()
+      .length(32)
+      .required()
+  };
+  return Joi.validate(req, schema);
+}
 
 module.exports = router;
