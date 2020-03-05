@@ -26,6 +26,20 @@ const supervisorSchema = new mongoose.Schema({
     required: true,
     maxlength: 11,
     minlength: 10
+  },
+  gender: {
+    type: String,
+    default: "unknown",
+    enum: ["unknown", "male", "female"]
+  },
+  avatar: {
+    type: String,
+    default: function() {
+      if (this.gender === "female")
+        return "https://efrs.s3-ap-southeast-1.amazonaws.com/common-assets/profile-avatar/female-avatar.png";
+      else
+        return "https://efrs.s3-ap-southeast-1.amazonaws.com/common-assets/profile-avatar/male-avatar.png";
+    }
   }
 });
 
@@ -47,7 +61,8 @@ module.exports.validateSupervisor = supervisor => {
     phone: Joi.string()
       .max(11)
       .min(10)
-      .required()
+      .required(),
+    gender: Joi.string().only(["unknown", "male", "female"])
   };
   return Joi.validate(supervisor, schema);
 };

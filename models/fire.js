@@ -10,8 +10,9 @@ const fireSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  userId: {
-    type: String,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true
   },
   createdAt: {
@@ -35,7 +36,7 @@ module.exports.validateFire = fire => {
   const schema = {
     longtitude: Joi.number().required(),
     latitude: Joi.number().required(),
-    userId: Joi.objectId().required()
+    user: Joi.objectId().required()
   };
   return Joi.validate(fire, schema);
 };

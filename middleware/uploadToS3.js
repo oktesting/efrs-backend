@@ -9,11 +9,21 @@ const s3 = new AWS.S3({
   accessKeyId: ID,
   secretAccessKey: SECRET
 });
-module.exports.uploadEvidences = (file, fire) => {
+
+module.exports.uploadAvatar = (avatar, user) => {
+  const key = `avatar/${user._id}/${avatar.originalname}`;
+  return uploadFile(key, avatar);
+};
+
+module.exports.uploadEvidence = (evidence, fire) => {
   // Setting up S3 upload parameters
-  const key = `evidences/${fire.userId}/${fire._id}/${Date.now()}_${
-    file.originalname
+  const key = `evidences/${fire.user}/${fire._id}/${Date.now()}_${
+    evidence.originalname
   }`;
+  return uploadFile(key, evidence);
+};
+
+function uploadFile(key, file) {
   const params = {
     Bucket: BUCKET_NAME,
     Key: key, // File name you want to save as in S3
@@ -29,5 +39,5 @@ module.exports.uploadEvidences = (file, fire) => {
     }
     console.log(`file is uploaded to ${data.Location}`);
   });
-  return `https://efrs.s3.amazonaws.com/${key}`;
-};
+  return `https://efrs.${config.get("aws_bucket_region")}.amazonaws.com/${key}`;
+}

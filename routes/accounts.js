@@ -6,7 +6,7 @@ const { Account, validateAccount } = require("../models/account");
 const validateOjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validate");
 const auth = require("../middleware/auth");
-const isAdmin = require("../middleware/admin");
+const { isAdmin } = require("../middleware/getRole");
 const {
   sendConfirmationEmail,
   sendResetPasswordMail
@@ -17,10 +17,14 @@ const router = express.Router();
 //getting the current logged in - authenticated user
 //not using ':id' on the link to secure the account id
 //instead extract account._id by using jwt
-router.get("/me", [auth, isAdmin], async (req, res) => {
+router.get("/me", [auth], async (req, res) => {
   //exclude password from being showed
-  const account = await Account.findById(req.account._id).select("-password");
-  res.send(account);
+  return res.status(200).send(
+    await Account.findById(req.account._id)
+      .populate("user")
+      .populate("supervisor")
+      .select("-password")
+  );
 });
 
 //register route
@@ -32,14 +36,13 @@ router.post("/", validate(validateAccount), async (req, res) => {
   account.password = await bcrypt.hash(account.password, salt);
   await account.save();
   sendConfirmationEmail(account);
-  const jwtToken = account.generateAuthToken();
-  return (
-    res
-      .header("x-auth-token", jwtToken)
-      //allow client to read the jwt in header
-      .header("access-control-expose-headers", "x-auth-token")
-      .send(_.pick(account, ["_id", "name", "email"]))
-  );
+  // const jwtToken = account.generateAuthToken();
+  return res.status(200).send(account._id);
+  // res
+  //   .header("x-auth-token", jwtToken)
+  //   //allow client to read the jwt in header
+  //   .header("access-control-expose-headers", "x-auth-token")
+  //   .send(_.pick(account, ["_id", "name", "email"]));
 });
 
 //confirmation route
@@ -47,7 +50,7 @@ router.get("/confirmation/:token", async (req, res) => {
   const confirmationToken = await Token.findOne({ token: req.params.token });
   if (!confirmationToken)
     return res.status(404).send("verification token is invalid or expired");
-  const account = await Account.findById(confirmationToken.accountId);
+  const account = await Account.findById(confirmationToken.account);
   if (!account) return res.status(404).send("account is not found");
   if (account.isVerified)
     return res.status(400).send("account is already verified");
@@ -81,7 +84,7 @@ router.post("/reset", validate(validateReset), async (req, res) => {
   if (!resetToken)
     return res.status(404).send("reset token is invalid or expired");
 
-  let account = await Account.findById(resetToken.accountId);
+  let account = await Account.findById(resetToken.account);
   if (!account) return res.status(404).send("account is not found");
 
   const salt = await bcrypt.genSalt();

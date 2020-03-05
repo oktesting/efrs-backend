@@ -22,7 +22,7 @@ router.get("/", handleAlert);
 
 router.post("/", [array("files", 3), validate(validateFire), addAlert]);
 
-router.post("/:id", [
+router.put("/:id", [
   validateObjectId,
   array("files", 3),
   addEvidencesToCurrentAlert

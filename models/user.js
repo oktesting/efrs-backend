@@ -25,6 +25,20 @@ const User = mongoose.model(
       required: true,
       max: 100,
       min: 18
+    },
+    gender: {
+      type: String,
+      default: "unknown",
+      enum: ["unknown", "male", "female"]
+    },
+    avatar: {
+      type: String,
+      default: function() {
+        if (this.gender === "female")
+          return "https://efrs.s3-ap-southeast-1.amazonaws.com/common-assets/profile-avatar/female-avatar.png";
+        else
+          return "https://efrs.s3-ap-southeast-1.amazonaws.com/common-assets/profile-avatar/male-avatar.png";
+      }
     }
   })
 );
@@ -42,7 +56,8 @@ module.exports.validateUser = user => {
     age: Joi.number()
       .max(100)
       .min(18)
-      .required()
+      .required(),
+    gender: Joi.string().only(["unknown", "male", "female"])
   };
   return Joi.validate(user, schema);
 };

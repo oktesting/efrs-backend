@@ -1,6 +1,5 @@
-const fs = require("fs");
 const { Fire } = require("../models/fire");
-const { uploadEvidences } = require("./uploadToS3");
+const { uploadEvidence } = require("./uploadToS3");
 
 let clients = [];
 let id = 0;
@@ -8,7 +7,7 @@ let id = 0;
 function addEvidencesToFire(req, fire) {
   req.files.forEach(file => {
     let evidence = { ...file };
-    evidence["location"] = uploadEvidences(file, fire);
+    evidence["location"] = uploadEvidence(file, fire);
     //remove unneccessary buffer of file
     delete evidence.buffer;
     fire.evidences.push(evidence);
@@ -37,12 +36,16 @@ module.exports.addAlert = async (req, res, next) => {
   addEvidencesToFire(req, fire);
   await fire.save();
   res.send({ _id: fire._id });
-  return sendEventsToAll(fire);
+  return sendEventsToAll(
+    await Fire.findById(fire._id)
+      .populate("user", "-__v")
+      .select("-__v")
+  );
 };
 
 module.exports.addEvidencesToCurrentAlert = async (req, res, next) => {
   const fire = await Fire.findById(req.params.id);
-  if (!fire) return res.status(404).send("not found fire with given id");
+  if (!fire) return res.status(404).send("fire is not found");
   addEvidencesToFire(req, fire);
   await fire.save();
   return res.status(200).send("evidences is submitted");
@@ -59,7 +62,9 @@ module.exports.handleAlert = async (req, res, next) => {
   res.writeHead(200, headers);
   res.flushHeaders();
 
-  const data = await Fire.find();
+  const data = await Fire.find()
+    .populate("user", "-__v")
+    .select("-__v");
   res.write(`id: ${++id}\n`);
   res.write("event: firstEvent\n");
   res.write(`data: ${JSON.stringify(data)}\n\n`);

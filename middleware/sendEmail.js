@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 
 module.exports.sendConfirmationEmail = async account => {
   const confirmationToken = new Token({
-    accountId: account._id,
+    account: account._id,
     token: crypto.randomBytes(16).toString("hex")
   });
   await confirmationToken.save();
@@ -34,7 +34,7 @@ module.exports.sendConfirmationEmail = async account => {
 
 module.exports.sendResetPasswordMail = async account => {
   const resetToken = new Token({
-    accountId: account._id,
+    account: account._id,
     token: crypto.randomBytes(16).toString("hex")
   });
   await resetToken.save();
