@@ -18,14 +18,7 @@ router.post(
       return res.status(400).send("this account is already registered");
 
     //create supervisor profile
-    const supervisor = Supervisor({
-      unitCoordinate: req.body.unitCoordinate,
-      unitName: req.body.unitName,
-      fullname: req.body.fullname,
-      phone: req.body.phone,
-      gender: req.body.gender
-    });
-
+    const supervisor = Supervisor(req.body);
     //set account to associate to an supervisor profile
     account.supervisor = supervisor._id;
     await account.save();
@@ -42,8 +35,7 @@ router.put(
     let supervisor = await Supervisor.findById(req.params.id);
     if (!supervisor) return res.status(404).send("supervisor is not found");
     const data = {
-      unitCoordinate: req.body.unitCoordinate,
-      unitName: req.body.unitName,
+      location: req.body.location,
       fullname: req.body.fullname,
       phone: req.body.phone,
       gender: req.body.gender

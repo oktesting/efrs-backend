@@ -4,7 +4,7 @@
   "aws_id": "AKIAYXFDKX2L6XJIG654",
   "aws_secret": "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",
   "aws_bucket_name": "efrs",
-  "aws_bucket_region": "s3-ap-southeast-1",
+  "aws_bucket_region": "ap-southeast-1",
   "jwtPrivateKey": "changeToEnvironmentVariable",
   "email_user": "duccmse06002@fpt.edu.vn",
   "email_pass": "duc01101998",

@@ -37,7 +37,9 @@ function uploadFile(key, file) {
     if (err) {
       throw err;
     }
-    console.log(`file is uploaded to ${data.Location}`);
+    // console.log(`file is uploaded to ${data.Location}`);
   });
-  return `https://efrs.${config.get("aws_bucket_region")}.amazonaws.com/${key}`;
+  return `https://efrs.s3.${config.get(
+    "aws_bucket_region"
+  )}.amazonaws.com/${key}`;
 }

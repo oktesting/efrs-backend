@@ -4,6 +4,13 @@ const Joi = require("joi");
 const User = mongoose.model(
   "User",
   new mongoose.Schema({
+    locations: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Location",
+        required: false
+      }
+    ],
     isActivated: {
       type: Boolean,
       default: true

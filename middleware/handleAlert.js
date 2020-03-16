@@ -47,7 +47,7 @@ module.exports.addEvidencesToCurrentAlert = async (req, res, next) => {
   const fire = await Fire.findById(req.params.id);
   if (!fire) return res.status(404).send("fire is not found");
   addEvidencesToFire(req, fire);
-  await fire.save();
+  sendEventsToAll(await fire.save());
   return res.status(200).send("evidences is submitted");
 };
 

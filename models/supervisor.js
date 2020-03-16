@@ -12,13 +12,9 @@ const supervisorSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  unitName: {
-    type: String,
-    required: true
-  },
-  // coordinate of supervisor's unit, contains 2 elements [lat,long]
-  unitCoordinate: {
-    type: Array,
+  location: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Location",
     required: true
   },
   phone: {
@@ -50,14 +46,7 @@ module.exports.validateSupervisor = supervisor => {
       .max(50)
       .min(5)
       .required(),
-    unitName: Joi.string()
-      .max(50)
-      .min(5)
-      .required(),
-    unitCoordinate: Joi.array()
-      .items(Joi.number())
-      .length(2)
-      .required(),
+    location: Joi.objectId().required(),
     phone: Joi.string()
       .max(11)
       .min(10)
