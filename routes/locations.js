@@ -34,7 +34,9 @@ router.post(
 );
 //get all fire station
 router.get("/fire-station", async (req, res) => {
-  return res.status(200).send(await Location.find({ isFireStation: true }));
+  return res
+    .status(200)
+    .send(await Location.find({ isFireStation: true }).select("-__v"));
 });
 //get all locations of an user
 router.get("/:id", [valdidateObjectId], async (req, res) => {
@@ -42,7 +44,7 @@ router.get("/:id", [valdidateObjectId], async (req, res) => {
   if (!user) return res.status(404).send("user is not found");
   let locations = new Array(0);
   for (const id of user.locations) {
-    locations.push(await Location.findById(id));
+    locations.push(await Location.findById(id).select("-__v"));
   }
   return res.status(200).send(locations);
 });

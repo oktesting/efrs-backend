@@ -7,7 +7,9 @@ const { Account } = require("../models/account");
 
 //login route
 router.post("/", validate(validateAuth), async (req, res) => {
-  let account = await Account.findOne({ email: req.body.email });
+  let account = await Account.findOne({ email: req.body.email })
+    .populate("user", "-__v")
+    .populate("supervisor", "-__v");
   if (!account) return res.status(400).send("Email or password is incorrect");
   const isValidPassword = await bcrypt.compare(
     req.body.password,
@@ -15,7 +17,7 @@ router.post("/", validate(validateAuth), async (req, res) => {
   );
   if (isValidPassword) {
     if (!account.isVerified) {
-      return res.status(401).send("your account has not verified");
+      return res.status(401).send("Your account has not verified");
     }
     const jwtToken = account.generateAuthToken();
     return res.send(jwtToken);

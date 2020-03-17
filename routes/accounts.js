@@ -21,16 +21,16 @@ router.get("/me", [auth], async (req, res) => {
   //exclude password from being showed
   return res.status(200).send(
     await Account.findById(req.account._id)
-      .populate("user")
-      .populate("supervisor")
-      .select("-password")
+      .populate("user", "-__v")
+      .populate("supervisor", "-__v")
+      .select("-password -__v")
   );
 });
 
 //register route
 router.post("/", validate(validateAccount), async (req, res) => {
   let account = await Account.findOne({ email: req.body.email });
-  if (account) return res.status(400).send("this email already registered");
+  if (account) return res.status(400).send("This email already registered");
   account = new Account(_.pick(req.body, ["name", "email", "password"]));
   const salt = await bcrypt.genSalt();
   account.password = await bcrypt.hash(account.password, salt);
@@ -49,48 +49,48 @@ router.post("/", validate(validateAccount), async (req, res) => {
 router.get("/confirmation/:token", async (req, res) => {
   const confirmationToken = await Token.findOne({ token: req.params.token });
   if (!confirmationToken)
-    return res.status(404).send("verification token is invalid or expired");
+    return res.status(404).send("Verification token is invalid or expired");
   const account = await Account.findById(confirmationToken.account);
-  if (!account) return res.status(404).send("account is not found");
+  if (!account) return res.status(404).send("Account is not found");
   if (account.isVerified)
-    return res.status(400).send("account is already verified");
+    return res.status(400).send("Account is already verified");
   account.isVerified = true;
   await account.save();
-  return res.status(200).send("account is now verified. please log in");
+  return res.status(200).send("Account is now verified. please log in");
 });
 
 //resend confirmation email
 router.get("/resend/:id", validateOjectId, async (req, res) => {
   const account = await Account.findById(req.params.id);
-  if (!account) return res.status(404).send("account is not found");
+  if (!account) return res.status(404).send("Account is not found");
   if (account.isVerified)
-    return res.status(400).send("account is already verified");
+    return res.status(400).send("Account is already verified");
   sendConfirmationEmail(account);
-  return res.status(200).send("an verification email is sent to your email");
+  return res.status(200).send("An verification email is sent to your email");
 });
 
 //forget password request
 router.post("/forgot-password", async (req, res) => {
-  if (!req.body.email) return res.status(400).send("email must be provided");
+  if (!req.body.email) return res.status(400).send("Email must be provided");
   const account = await Account.findOne({ email: req.body.email });
   if (!account) return res.status(404).send("account is not found");
   sendResetPasswordMail(account);
-  return res.status(200).send("reset password email is sent to your email");
+  return res.status(200).send("Reset password email is sent to your email");
 });
 
 //reset password handled
 router.post("/reset", validate(validateReset), async (req, res) => {
   const resetToken = await Token.findOne({ token: req.body.token });
   if (!resetToken)
-    return res.status(404).send("reset token is invalid or expired");
+    return res.status(404).send("Reset token is invalid or expired");
 
   let account = await Account.findById(resetToken.account);
-  if (!account) return res.status(404).send("account is not found");
+  if (!account) return res.status(404).send("Account is not found");
 
   const salt = await bcrypt.genSalt();
   account.password = await bcrypt.hash(req.body.newPassword, salt);
   await account.save();
-  return res.status(200).send("password is changed successfully");
+  return res.status(200).send("Password is changed successfully");
 });
 
 function validateReset(req) {
