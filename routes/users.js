@@ -2,10 +2,31 @@ const valdidateObjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validate");
 const { single } = require("../middleware/uploadToServer");
 const { uploadAvatar } = require("../middleware/uploadToS3");
+const auth = require("../middleware/auth");
 const { Account } = require("../models/account");
 const { User, validateUser } = require("../models/user");
 const express = require("express");
 const router = express.Router();
+
+//get all users
+router.get("/", [auth], async (req, res) => {
+  const accounts = await Account.find()
+    .populate("user", "-__v")
+    .select("-__v -password");
+  return res
+    .status(200)
+    .send(accounts.filter(acc => acc.user !== undefined && acc.user !== null));
+});
+
+//get one user
+router.get("/:id", [auth, valdidateObjectId], async (req, res) => {
+  const acc = await Account.findById(req.params.id)
+    .populate("user", "-__v")
+    .select("-password -__v");
+  if (!acc || acc.user === undefined || acc.user === null)
+    return res.status(404).send("User is not found");
+  return res.status(200).send(acc);
+});
 
 //create new user
 router.post(

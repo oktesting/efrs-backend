@@ -8,12 +8,29 @@ const auth = require("../middleware/auth");
 const express = require("express");
 const router = express.Router();
 
+//get all supervisor
 router.get("/", [auth], async (req, res) => {
-  const supervisor = await Supervisor.findById(
-    req.account.supervisor._id
-  ).select("-__v");
-  if (!supervisor) return res.status(404).send("supervisor is not found");
-  return res.status(200).send(supervisor);
+  const accounts = await Account.find()
+    .populate("supervisor", "-__v")
+    .select("-__v -password");
+  return res
+    .status(200)
+    .send(
+      accounts.filter(
+        acc => acc.supervisor !== undefined && acc.supervisor !== null
+      )
+    );
+});
+
+//get one supervisor
+router.get("/:id", [auth, valdidateObjectId], async (req, res) => {
+  const acc = await Account.findById(req.params.id)
+    .populate("supervisor", "-__v")
+    .select("-__v -password");
+
+  if (!acc || acc.supervisor === undefined || acc.supervisor === null)
+    return res.status(404).send("supervisor is not found");
+  return res.status(200).send(acc);
 });
 
 //create new supervisor
