@@ -6,6 +6,7 @@ const supervisors = require("../routes/supervisors");
 const users = require("../routes/users");
 const locations = require("../routes/locations");
 const emergencyAlerts = require("../routes/emergencyAlerts");
+const firesHisotry = require("../routes/firesHistory");
 
 //error is express's middleware function that we implemented to handle error
 const error = require("../middleware/error");
@@ -24,6 +25,7 @@ module.exports = function(app) {
   app.use("/api/auth", auth);
   app.use("/api/locations", locations);
   app.use("/api/emergency-alerts", emergencyAlerts);
+  app.use("/api/fires-history", firesHisotry);
 
   app.use(error); //handle error after all above middleware
 };

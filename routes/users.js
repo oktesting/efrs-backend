@@ -3,6 +3,7 @@ const validate = require("../middleware/validate");
 const { single } = require("../middleware/uploadToServer");
 const { uploadAvatar } = require("../middleware/uploadToS3");
 const auth = require("../middleware/auth");
+const { isSupervisor } = require("../middleware/getRole");
 const { Account } = require("../models/account");
 const { User, validateUser } = require("../models/user");
 const express = require("express");
@@ -27,6 +28,18 @@ router.get("/:id", [auth, valdidateObjectId], async (req, res) => {
     return res.status(404).send("User is not found");
   return res.status(200).send(acc);
 });
+//change activation of user
+router.get(
+  "/change-activation/:id",
+  [auth, isSupervisor, valdidateObjectId],
+  async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).send("User is not found");
+    user.isActivated = !user.isActivated;
+    await user.save();
+    return res.status(200).send("User activation is changed");
+  }
+);
 
 //create new user
 router.post(
