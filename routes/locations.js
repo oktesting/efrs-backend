@@ -1,5 +1,6 @@
 const valdidateObjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validate");
+const auth = require("../middleware/auth");
 const {
   Location,
   validateUserLocation,
@@ -9,19 +10,20 @@ const { User } = require("../models/user");
 const express = require("express");
 const router = express.Router();
 
-router.post("/fire-station", [
-  validate(validateFireStation),
+router.post(
+  "/fire-station",
+  [auth, validate(validateFireStation)],
   async (req, res) => {
     const location = Location({ ...req.body, isFireStation: true });
     await location.save();
     return res.status(200).send(location);
   }
-]);
+);
 
 //add location for an user
 router.post(
   "/:id",
-  [valdidateObjectId, validate(validateUserLocation)],
+  [auth, valdidateObjectId, validate(validateUserLocation)],
   async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).send("user is not found");
@@ -33,13 +35,13 @@ router.post(
   }
 );
 //get all fire station
-router.get("/fire-station", async (req, res) => {
+router.get("/fire-station", [auth], async (req, res) => {
   return res
     .status(200)
     .send(await Location.find({ isFireStation: true }).select("-__v"));
 });
 //get all locations of an user
-router.get("/:id", [valdidateObjectId], async (req, res) => {
+router.get("/:id", [auth, valdidateObjectId], async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) return res.status(404).send("user is not found");
   let locations = new Array(0);
@@ -47,6 +49,12 @@ router.get("/:id", [valdidateObjectId], async (req, res) => {
     locations.push(await Location.findById(id).select("-__v"));
   }
   return res.status(200).send(locations);
+});
+
+router.delete("/:id", [auth, valdidateObjectId], async (req, res) => {
+  const location = await Location.findByIdAndRemove(req.params.id);
+  if (!location) return res.status(404).send("Location is not found");
+  res.status(200).send("Location is deleted");
 });
 
 module.exports = router;
