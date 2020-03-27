@@ -62,7 +62,7 @@ module.exports.handleAlert = async (req, res, next) => {
   res.writeHead(200, headers);
   res.flushHeaders();
 
-  const data = await Fire.find()
+  const data = await Fire.find({ status: { $in: ["pending", "processing"] } })
     .populate("user", "-__v")
     .select("-__v");
   res.write(`id: ${++id}\n`);

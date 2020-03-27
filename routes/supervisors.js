@@ -5,6 +5,7 @@ const { Account } = require("../models/account");
 const { Supervisor, validateSupervisor } = require("../models/supervisor");
 const validate = require("../middleware/validate");
 const auth = require("../middleware/auth");
+const { isAdmin } = require("../middleware/getRole");
 const express = require("express");
 const router = express.Router();
 
@@ -21,6 +22,19 @@ router.get("/", [auth], async (req, res) => {
       )
     );
 });
+
+//change supervisor activation
+router.get(
+  "/change-activation/:id",
+  [auth, isAdmin, valdidateObjectId],
+  async (req, res) => {
+    const supervisor = await Supervisor.findById(req.params.id);
+    if (!supervisor) return res.status(404).send("Supervisor is not found");
+    supervisor.isActivated = !supervisor.isActivated;
+    await supervisor.save();
+    return res.status(200).send("Supervisor activation is changed");
+  }
+);
 
 //get one supervisor
 router.get("/:id", [auth, valdidateObjectId], async (req, res) => {

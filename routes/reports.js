@@ -26,7 +26,12 @@ router.get("/:id", [auth, valdidateObjectId], async (req, res) => {
 });
 
 router.post("/", [auth, validate(validateReport)], async (req, res) => {
-  const report = Report(req.body);
+  let report = await Report.find({ fire: req.body.fire });
+  //prevent submit another report for a fire
+  if (report.length !== 0) {
+    return res.status(400).send("There is already report for this fire");
+  }
+  report = Report(req.body);
   const receivedTime = moment(req.body.receivedTime);
   const finishedTime = moment(req.body.finishedTime);
   report.duration = `${finishedTime.diff(
