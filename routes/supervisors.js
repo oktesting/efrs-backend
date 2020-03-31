@@ -43,16 +43,16 @@ router.get("/:id", [auth, valdidateObjectId], async (req, res) => {
     .select("-__v -password");
 
   if (!acc || acc.supervisor === undefined || acc.supervisor === null)
-    return res.status(404).send("supervisor is not found");
+    return res.status(404).send("Supervisor is not found");
   return res.status(200).send(acc);
 });
 
 //create new supervisor
 router.post("/", [auth, validate(validateSupervisor)], async (req, res) => {
   let account = await Account.findById(req.account._id);
-  if (!account) return res.status(404).send("account is not found");
+  if (!account) return res.status(404).send("Account is not found");
   if (account.supervisor)
-    return res.status(400).send("this account is already registered");
+    return res.status(400).send("This account is already registered");
 
   //create supervisor profile
   const supervisor = Supervisor(req.body);
@@ -60,7 +60,15 @@ router.post("/", [auth, validate(validateSupervisor)], async (req, res) => {
   account.supervisor = supervisor._id;
   await account.save();
   await supervisor.save();
-  return res.status(200).send(supervisor);
+  account["supervisor"] = supervisor;
+  const token = account.generateAuthToken();
+  return (
+    res
+      .header("x-auth-token", token)
+      //allow client to read the jwt in header
+      .header("access-control-expose-headers", "x-auth-token")
+      .send("Supervisor is created")
+  );
 });
 
 //update supervisor
@@ -68,6 +76,8 @@ router.put(
   "/",
   [auth, single("avatar"), validate(validateSupervisor)],
   async (req, res) => {
+    let account = await Account.findById(req.account._id);
+    if (!account) return res.status(404).send("Account is not found");
     let supervisor = await Supervisor.findById(req.account.supervisor._id);
     if (!supervisor) return res.status(404).send("Supervisor is not found");
     const data = {
@@ -85,7 +95,15 @@ router.put(
         useFindAndModify: false
       }
     );
-    res.status(200).send(supervisor);
+    account["supervisor"] = supervisor;
+    const token = account.generateAuthToken();
+    return (
+      res
+        .header("x-auth-token", token)
+        //allow client to read the jwt in header
+        .header("access-control-expose-headers", "x-auth-token")
+        .send("Supervisor is created")
+    );
   }
 );
 module.exports = router;
