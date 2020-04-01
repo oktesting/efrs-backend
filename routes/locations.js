@@ -52,7 +52,9 @@ router.get("/:id", [auth, valdidateObjectId], async (req, res) => {
 });
 
 router.delete("/:id", [auth, valdidateObjectId], async (req, res) => {
-  const location = await Location.findByIdAndRemove(req.params.id);
+  const location = await Location.findByIdAndRemove(req.params.id, {
+    useFindAndModify: false
+  });
   if (!location) return res.status(404).send("Location is not found");
   res.status(200).send("Location is deleted");
 });

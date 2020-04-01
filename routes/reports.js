@@ -26,6 +26,7 @@ router.get("/:id", [auth, valdidateObjectId], async (req, res) => {
 });
 
 router.post("/", [auth, validate(validateReport)], async (req, res) => {
+  //@todo: check whether the fire is exist
   let report = await Report.find({ fire: req.body.fire });
   //prevent submit another report for a fire
   if (report.length !== 0) {
@@ -37,9 +38,40 @@ router.post("/", [auth, validate(validateReport)], async (req, res) => {
   report.duration = `${finishedTime.diff(
     receivedTime,
     "hours"
-  )} hours and ${finishedTime.diff(receivedTime, "minutes") % 60} minutes`;
+  )} tiếng ${finishedTime.diff(receivedTime, "minutes") % 60} phút`;
   await report.save();
   return res.status(200).send("Report is submitted");
 });
+
+//delete one report
+router.delete("/:id", [auth, valdidateObjectId], async (req, res) => {
+  const report = await Report.findByIdAndRemove(req.params.id, {
+    useFindAndModify: false
+  });
+  if (!report) return res.status(404).send("Report is not found");
+  const fire = await Fire.findByIdAndRemove(report.fire, {
+    useFindAndModify: false
+  });
+  if (!fire) return res.status(404).send("Fire is not found");
+  return res.status(200).send("Report and its Fire are deleted");
+});
+
+//edit a report
+router.put(
+  "/:id",
+  [auth, valdidateObjectId, validate(validateReport)],
+  async (req, res) => {
+    //not modified these fields in db
+    delete req.body.fire;
+    delete req.body.receivedTime;
+    delete req.body.finishedTime;
+    const report = await Report.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      useFindAndModify: false
+    });
+    if (!report) return res.status(404).send("Report is not found");
+    return res.status(200).send("Report is modified");
+  }
+);
 
 module.exports = router;
