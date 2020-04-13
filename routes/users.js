@@ -1,7 +1,7 @@
 const valdidateObjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validate");
-const { single } = require("../middleware/uploadToServer");
-const { uploadAvatar } = require("../middleware/uploadToS3");
+const { single } = require("../services/uploadToServer");
+const { uploadAvatar } = require("../services/uploadToS3");
 const auth = require("../middleware/auth");
 const { isSupervisor } = require("../middleware/getRole");
 const { Account } = require("../models/account");
@@ -16,7 +16,9 @@ router.get("/", [auth], async (req, res) => {
     .select("-__v -password");
   return res
     .status(200)
-    .send(accounts.filter(acc => acc.user !== undefined && acc.user !== null));
+    .send(
+      accounts.filter((acc) => acc.user !== undefined && acc.user !== null)
+    );
 });
 
 //get one user
@@ -56,7 +58,7 @@ router.post(
       fullname: req.body.fullname,
       phone: req.body.phone,
       age: req.body.age,
-      gender: req.body.gender
+      gender: req.body.gender,
     });
 
     //set account to associate to an user profile
@@ -78,12 +80,12 @@ router.put(
       fullname: req.body.fullname,
       phone: req.body.phone,
       age: req.body.age,
-      gender: req.body.gender
+      gender: req.body.gender,
     };
     if (req.file) data["avatar"] = uploadAvatar(req.file, user);
     user = await User.findByIdAndUpdate(req.params.id, data, {
       new: true,
-      useFindAndModify: false
+      useFindAndModify: false,
     });
     res.status(200).send(user);
   }

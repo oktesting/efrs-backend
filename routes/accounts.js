@@ -9,8 +9,8 @@ const auth = require("../middleware/auth");
 const { isAdmin } = require("../middleware/getRole");
 const {
   sendConfirmationEmail,
-  sendResetPasswordMail
-} = require("../middleware/sendEmail");
+  sendResetPasswordMail,
+} = require("../services/sendEmail");
 const { Token } = require("../models/token");
 
 const router = express.Router();
@@ -19,12 +19,14 @@ const router = express.Router();
 //instead extract account._id by using jwt
 router.get("/me", [auth], async (req, res) => {
   //exclude password from being showed
-  return res.status(200).send(
-    await Account.findById(req.account._id)
-      .populate("user", "-__v")
-      .populate("supervisor", "-__v")
-      .select("-password -__v")
-  );
+  return res
+    .status(200)
+    .send(
+      await Account.findById(req.account._id)
+        .populate("user", "-__v")
+        .populate("supervisor", "-__v")
+        .select("-password -__v")
+    );
 });
 
 //register route
@@ -95,13 +97,8 @@ router.post("/reset", validate(validateReset), async (req, res) => {
 
 function validateReset(req) {
   const schema = {
-    newPassword: Joi.string()
-      .min(5)
-      .max(255)
-      .required(),
-    token: Joi.string()
-      .length(32)
-      .required()
+    newPassword: Joi.string().min(5).max(255).required(),
+    token: Joi.string().length(32).required(),
   };
   return Joi.validate(req, schema);
 }

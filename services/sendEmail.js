@@ -7,14 +7,14 @@ const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
     user: config.get("email_user"),
-    pass: config.get("email_pass")
-  }
+    pass: config.get("email_pass"),
+  },
 });
 
-module.exports.sendConfirmationEmail = async account => {
+module.exports.sendConfirmationEmail = async (account) => {
   const confirmationToken = new Token({
     account: account._id,
-    token: crypto.randomBytes(16).toString("hex")
+    token: crypto.randomBytes(16).toString("hex"),
   });
   await confirmationToken.save();
   const mailOptions = {
@@ -27,15 +27,15 @@ module.exports.sendConfirmationEmail = async account => {
       config.get("base_url") +
       "/api/accounts/confirmation/" +
       confirmationToken.token +
-      "\nThis token will be expires in one hours"
+      "\nThis token will be expires in one hours",
   };
   await transporter.sendMail(mailOptions);
 };
 
-module.exports.sendResetPasswordMail = async account => {
+module.exports.sendResetPasswordMail = async (account) => {
   const resetToken = new Token({
     account: account._id,
-    token: crypto.randomBytes(16).toString("hex")
+    token: crypto.randomBytes(16).toString("hex"),
   });
   await resetToken.save();
   const mailOptions = {
@@ -49,7 +49,7 @@ module.exports.sendResetPasswordMail = async account => {
       config.get("base_url") +
       "/api/accounts/reset/" +
       resetToken.token +
-      "\nThis token will be expires in one hours"
+      "\nThis token will be expires in one hours",
   };
   await transporter.sendMail(mailOptions);
 };

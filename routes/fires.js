@@ -3,10 +3,10 @@ const express = require("express");
 const {
   addAlert,
   handleAlert,
-  addEvidencesToCurrentAlert
+  addEvidencesToCurrentAlert,
 } = require("../middleware/handleAlert");
 const validate = require("../middleware/validate");
-const { array } = require("../middleware/uploadToServer");
+const { array } = require("../services/uploadToServer");
 const validateObjectId = require("../middleware/validateObjectId");
 const auth = require("../middleware/auth");
 const { isSupervisor } = require("../middleware/getRole");
@@ -41,7 +41,7 @@ router.post("/", [array("files", 3), validate(validateFire), addAlert]);
 router.put("/:id", [
   validateObjectId,
   array("files", 3),
-  addEvidencesToCurrentAlert
+  addEvidencesToCurrentAlert,
 ]);
 
 module.exports = router;

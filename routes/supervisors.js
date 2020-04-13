@@ -1,6 +1,6 @@
 const valdidateObjectId = require("../middleware/validateObjectId");
-const { single } = require("../middleware/uploadToServer");
-const { uploadAvatar } = require("../middleware/uploadToS3");
+const { single } = require("../services/uploadToServer");
+const { uploadAvatar } = require("../services/uploadToS3");
 const { Account } = require("../models/account");
 const { Supervisor, validateSupervisor } = require("../models/supervisor");
 const validate = require("../middleware/validate");
@@ -18,7 +18,7 @@ router.get("/", [auth], async (req, res) => {
     .status(200)
     .send(
       accounts.filter(
-        acc => acc.supervisor !== undefined && acc.supervisor !== null
+        (acc) => acc.supervisor !== undefined && acc.supervisor !== null
       )
     );
 });
@@ -84,7 +84,7 @@ router.put(
       location: req.body.location,
       fullname: req.body.fullname,
       phone: req.body.phone,
-      gender: req.body.gender
+      gender: req.body.gender,
     };
     if (req.file) data["avatar"] = uploadAvatar(req.file, supervisor);
     supervisor = await Supervisor.findByIdAndUpdate(
@@ -92,7 +92,7 @@ router.put(
       data,
       {
         new: true,
-        useFindAndModify: false
+        useFindAndModify: false,
       }
     );
     account["supervisor"] = supervisor;

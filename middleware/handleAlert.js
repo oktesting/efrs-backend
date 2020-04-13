@@ -1,11 +1,11 @@
 const { Fire } = require("../models/fire");
-const { uploadEvidence } = require("./uploadToS3");
+const { uploadEvidence } = require("../services/uploadToS3");
 
 let clients = [];
 let id = 0;
 
 function addEvidencesToFire(req, fire) {
-  req.files.forEach(file => {
+  req.files.forEach((file) => {
     let evidence = { ...file };
     evidence["location"] = uploadEvidence(file, fire);
     //remove unneccessary buffer of file
@@ -16,7 +16,7 @@ function addEvidencesToFire(req, fire) {
 
 // Iterate clients list and use write res object method to send new nest
 function sendEventsToAll(newFire) {
-  clients.forEach(c => {
+  clients.forEach((c) => {
     c.res.write(`id: ${++id}\n`);
     c.res.write("event: realtimeEvent\n");
     c.res.write(`data: ${JSON.stringify(newFire)}\n\n`);
@@ -26,7 +26,7 @@ function sendEventsToAll(newFire) {
 function closeConnection(response, clientId) {
   if (!response.finished) {
     response.end();
-    clients = clients.filter(c => c.id !== clientId);
+    clients = clients.filter((c) => c.id !== clientId);
     console.log(`${clientId} Connection closed`);
   }
 }
@@ -37,9 +37,7 @@ module.exports.addAlert = async (req, res, next) => {
   await fire.save();
   res.send({ _id: fire._id });
   return sendEventsToAll(
-    await Fire.findById(fire._id)
-      .populate("user", "-__v")
-      .select("-__v")
+    await Fire.findById(fire._id).populate("user", "-__v").select("-__v")
   );
 };
 
@@ -57,7 +55,7 @@ module.exports.handleAlert = async (req, res, next) => {
   const headers = {
     "Content-Type": "text/event-stream",
     Connection: "keep-alive",
-    "Cache-Control": "no-cache"
+    "Cache-Control": "no-cache",
   };
   res.writeHead(200, headers);
   res.flushHeaders();
@@ -75,7 +73,7 @@ module.exports.handleAlert = async (req, res, next) => {
   const clientId = Date.now();
   const newClient = {
     id: clientId,
-    res
+    res,
   };
   clients.push(newClient);
   console.log(`${clientId} Connection opened`);
