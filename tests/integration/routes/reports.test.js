@@ -77,7 +77,7 @@ describe("/api/reports", () => {
       expect(res.status).toBe(401);
     });
 
-    it("should return 403 if account is supervisor", async () => {
+    it("should return 403 if account is not supervisor", async () => {
       token = new Account({}).generateAuthToken();
       const res = await exec();
       expect(res.status).toBe(403);

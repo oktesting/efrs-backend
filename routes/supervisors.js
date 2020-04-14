@@ -10,7 +10,7 @@ const express = require("express");
 const router = express.Router();
 
 //get all supervisor
-router.get("/", [auth], async (req, res) => {
+router.get("/", [auth, isAdmin], async (req, res) => {
   const accounts = await Account.find()
     .populate("supervisor", "-__v")
     .select("-__v -password");
@@ -102,7 +102,7 @@ router.put(
         .header("x-auth-token", token)
         //allow client to read the jwt in header
         .header("access-control-expose-headers", "x-auth-token")
-        .send("Supervisor is created")
+        .send("Supervisor is edited")
     );
   }
 );
