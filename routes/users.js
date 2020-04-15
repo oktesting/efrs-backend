@@ -10,7 +10,7 @@ const express = require("express");
 const router = express.Router();
 
 //get all users
-router.get("/", [auth], async (req, res) => {
+router.get("/", [auth, isSupervisor], async (req, res) => {
   const accounts = await Account.find()
     .populate("user", "-__v")
     .select("-__v -password");
@@ -44,38 +44,45 @@ router.get(
 );
 
 //create new user
-router.post(
-  "/:id",
-  [valdidateObjectId, validate(validateUser)],
-  async (req, res) => {
-    let account = await Account.findById(req.params.id);
-    if (!account) return res.status(404).send("account is not found");
-    if (account.user)
-      return res.status(400).send("this account is already registered");
+router.post("/", [auth, validate(validateUser)], async (req, res) => {
+  let account = await Account.findById(req.account._id);
+  if (!account) return res.status(404).send("Account is not found");
+  if (account.user)
+    return res.status(400).send("This account is already registered");
 
-    //create user profile
-    const user = User({
-      fullname: req.body.fullname,
-      phone: req.body.phone,
-      age: req.body.age,
-      gender: req.body.gender,
-    });
+  //create user profile
+  const user = User({
+    fullname: req.body.fullname,
+    phone: req.body.phone,
+    age: req.body.age,
+    gender: req.body.gender,
+  });
 
-    //set account to associate to an user profile
-    account.user = user._id;
-    await account.save();
-    await user.save();
-    return res.status(200).send(user);
-  }
-);
+  //set account to associate to an user profile
+  account.user = user._id;
+  await account.save();
+  await user.save();
+
+  account["user"] = user;
+  const token = account.generateAuthToken();
+  return (
+    res
+      .header("x-auth-token", token)
+      //allow client to read the jwt in header
+      .header("access-control-expose-headers", "x-auth-token")
+      .send("User is created")
+  );
+});
 
 //update user
 router.put(
-  "/:id",
-  [valdidateObjectId, single("avatar"), validate(validateUser)],
+  "/",
+  [auth, single("avatar"), validate(validateUser)],
   async (req, res) => {
-    let user = await User.findById(req.params.id);
-    if (!user) return res.status(404).send("user is not found");
+    let account = await Account.findById(req.account._id);
+    if (!account) return res.status(404).send("Account is not found");
+    let user = await User.findById(req.account.user._id);
+    if (!user) return res.status(404).send("User is not found");
     const data = {
       fullname: req.body.fullname,
       phone: req.body.phone,
@@ -83,11 +90,19 @@ router.put(
       gender: req.body.gender,
     };
     if (req.file) data["avatar"] = uploadAvatar(req.file, user);
-    user = await User.findByIdAndUpdate(req.params.id, data, {
+    user = await User.findByIdAndUpdate(req.account.user._id, data, {
       new: true,
       useFindAndModify: false,
     });
-    res.status(200).send(user);
+    account["user"] = user;
+    const token = account.generateAuthToken();
+    return (
+      res
+        .header("x-auth-token", token)
+        //allow client to read the jwt in header
+        .header("access-control-expose-headers", "x-auth-token")
+        .send("User is edited")
+    );
   }
 );
 

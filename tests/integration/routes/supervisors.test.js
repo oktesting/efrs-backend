@@ -67,6 +67,11 @@ describe("/api/supervisors", () => {
       expect(res.body).toHaveLength(1);
       expect(res.body[0]).not.toBeUndefined();
       expect(res.body[0]).not.toBeNull();
+      expect(res.body[0]).toHaveProperty("supervisor");
+      expect(res.body[0].supervisor).toHaveProperty(
+        "_id",
+        superId.toHexString()
+      );
     });
   });
 
@@ -138,7 +143,7 @@ describe("/api/supervisors", () => {
   });
 
   describe("GET /:id", () => {
-    let token, accId;
+    let token, accId, superId;
 
     //function that will be used in all the test-case
     const exec = async () => {
@@ -155,6 +160,7 @@ describe("/api/supervisors", () => {
         gender: "female",
       });
       await supervisor.save();
+      superId = supervisor._id;
 
       const acc = new Account({
         isAdmin: true,
@@ -199,6 +205,8 @@ describe("/api/supervisors", () => {
       const res = await exec();
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("_id", accId.toHexString());
+      expect(res.body).toHaveProperty("supervisor");
+      expect(res.body.supervisor).toHaveProperty("_id", superId.toHexString());
     });
   });
 
