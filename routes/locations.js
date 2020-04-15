@@ -1,18 +1,20 @@
+const { isAdmin } = require("../middleware/getRole");
 const valdidateObjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validate");
 const auth = require("../middleware/auth");
 const {
   Location,
   validateUserLocation,
-  validateFireStation
+  validateFireStation,
 } = require("../models/location");
 const { User } = require("../models/user");
 const express = require("express");
 const router = express.Router();
 
+//add new fire station
 router.post(
   "/fire-station",
-  [auth, validate(validateFireStation)],
+  [auth, isAdmin, validate(validateFireStation)],
   async (req, res) => {
     const location = Location({ ...req.body, isFireStation: true });
     await location.save();
@@ -26,7 +28,7 @@ router.post(
   [auth, valdidateObjectId, validate(validateUserLocation)],
   async (req, res) => {
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).send("user is not found");
+    if (!user) return res.status(404).send("User is not found");
     const location = Location(req.body);
     user.locations.push(location._id);
     await location.save();
@@ -43,7 +45,7 @@ router.get("/fire-station", [auth], async (req, res) => {
 //get all locations of an user
 router.get("/:id", [auth, valdidateObjectId], async (req, res) => {
   const user = await User.findById(req.params.id);
-  if (!user) return res.status(404).send("user is not found");
+  if (!user) return res.status(404).send("User is not found");
   let locations = new Array(0);
   for (const id of user.locations) {
     locations.push(await Location.findById(id).select("-__v"));
@@ -53,7 +55,7 @@ router.get("/:id", [auth, valdidateObjectId], async (req, res) => {
 
 router.delete("/:id", [auth, valdidateObjectId], async (req, res) => {
   const location = await Location.findByIdAndRemove(req.params.id, {
-    useFindAndModify: false
+    useFindAndModify: false,
   });
   if (!location) return res.status(404).send("Location is not found");
   res.status(200).send("Location is deleted");
