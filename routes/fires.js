@@ -9,20 +9,22 @@ const validate = require("../middleware/validate");
 const { array } = require("../services/uploadToServer");
 const validateObjectId = require("../middleware/validateObjectId");
 const auth = require("../middleware/auth");
-const { isSupervisor } = require("../middleware/getRole");
+const { isSupervisor, isUser } = require("../middleware/getRole");
 const { Fire } = require("../models/fire");
 
 const router = express.Router();
 
-router.get("/", handleAlert);
+router.get("/", [auth, isSupervisor, handleAlert]);
 
 router.get(
   "/change-status/:option/:id",
   [auth, isSupervisor, validateObjectId],
   async (req, res) => {
     const { option, id } = req.params;
+    if (option != 1 && option != 2)
+      return res.status(400).send("Option is invalid");
     let fire = await Fire.findById(id);
-    if (!fire) return res.status(400).send("Fire is not found");
+    if (!fire) return res.status(404).send("Fire is not found");
     if (option == 1) fire.status = "processing";
     else if (option == 2) fire.status = "finished";
     await fire.save();
@@ -36,9 +38,17 @@ router.get(
 //   res.send(fire);
 // });
 
-router.post("/", [array("files", 3), validate(validateFire), addAlert]);
+router.post("/", [
+  auth,
+  isUser,
+  array("files", 3),
+  validate(validateFire),
+  addAlert,
+]);
 
 router.put("/:id", [
+  auth,
+  isUser,
   validateObjectId,
   array("files", 3),
   addEvidencesToCurrentAlert,
