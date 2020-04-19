@@ -14,7 +14,7 @@ const { Fire } = require("../models/fire");
 
 const router = express.Router();
 
-router.get("/", [auth, isSupervisor, handleAlert]);
+router.get("/", handleAlert);
 
 router.get(
   "/change-status/:option/:id",
