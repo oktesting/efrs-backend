@@ -9,7 +9,10 @@ const { Account } = require("../models/account");
 router.post("/", validate(validateAuth), async (req, res) => {
   let account = await Account.findOne({ email: req.body.email })
     .populate("user", "-__v")
-    .populate("supervisor", "-__v");
+    .populate({
+      path: "supervisor",
+      populate: { path: "location" },
+    });
   if (!account) return res.status(400).send("Email or password is incorrect");
   const isValidPassword = await bcrypt.compare(
     req.body.password,
@@ -26,15 +29,8 @@ router.post("/", validate(validateAuth), async (req, res) => {
 
 function validateAuth(req) {
   const schema = {
-    email: Joi.string()
-      .min(5)
-      .max(255)
-      .email()
-      .required(),
-    password: Joi.string()
-      .min(5)
-      .max(255)
-      .required()
+    email: Joi.string().min(5).max(255).email().required(),
+    password: Joi.string().min(5).max(255).required(),
   };
   return Joi.validate(req, schema);
 }
