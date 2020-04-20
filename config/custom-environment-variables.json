@@ -6,5 +6,6 @@
   "aws_bucket_name": "efrs_aws_bucket_name",
   "aws_bucket_region": "efrs_aws_bucket_region",
   "email_user": "efrs_email_user",
-  "email_pass": "efrs_email_pass"
+  "email_pass": "efrs_email_pass",
+  "base_url": "efrs_base_url"
 }
