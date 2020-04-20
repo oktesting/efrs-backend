@@ -60,7 +60,9 @@ router.post("/", [auth, validate(validateSupervisor)], async (req, res) => {
   account.supervisor = supervisor._id;
   await account.save();
   await supervisor.save();
-  account["supervisor"] = supervisor;
+  account["supervisor"] = await Supervisor.findById(supervisor._id).populate(
+    "location"
+  );
   const token = account.generateAuthToken();
   return (
     res
@@ -94,7 +96,7 @@ router.put(
         new: true,
         useFindAndModify: false,
       }
-    );
+    ).populate("location");
     account["supervisor"] = supervisor;
     const token = account.generateAuthToken();
     return (
