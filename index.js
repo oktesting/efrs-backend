@@ -4,7 +4,7 @@ const config = require("config");
 const app = express();
 
 require("./startup/logging")();
-// require("./startup/config")();
+require("./startup/config")();
 require("./startup/cors")(app);
 require("./startup/routes")(app);
 require("./startup/db")();
