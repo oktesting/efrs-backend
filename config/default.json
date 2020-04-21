@@ -8,5 +8,6 @@
   "jwtPrivateKey": "changeToEnvironmentVariable",
   "email_user": "duccmse06002@fpt.edu.vn",
   "email_pass": "duc01101998",
-  "base_url": "localhost:3900"
+  "base_url": "localhost:3900",
+  "frontend_url": "localhost:3000"
 }
