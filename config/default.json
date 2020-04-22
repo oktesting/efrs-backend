@@ -9,5 +9,6 @@
   "email_user": "duccmse06002@fpt.edu.vn",
   "email_pass": "duc01101998",
   "base_url": "localhost:3900",
-  "frontend_url": "localhost:3000"
+  "frontend_url": "localhost:3000",
+  "firebase_server_api_key": "AAAAv3sPAfU:APA91bGjPfCc9esnHmlaMZSTjmBJqFavC51cUELjHB8BmjoDSrwt0jL-q-cuaplt8VAu4KRGX5Y65qj_vvAGKzYWht3NvZtQ180PCfn4_iGZrW-8FXwEKTZYuHl-rkZRl56EJu4VsL9a"
 }
