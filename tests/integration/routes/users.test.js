@@ -28,7 +28,7 @@ describe("/api/users", () => {
     //set the valid data for the happy path
     beforeEach(async () => {
       const user = new User({
-        age: 19,
+        dob: "01/01/2000",
         fullname: "abcdef",
         phone: "1111111111",
         gender: "female",
@@ -83,7 +83,7 @@ describe("/api/users", () => {
     //set the valid data for the happy path
     beforeEach(async () => {
       const user = new User({
-        age: 19,
+        dob: "01/01/2000",
         fullname: "abcdef",
         phone: "1111111111",
         gender: "female",
@@ -153,7 +153,7 @@ describe("/api/users", () => {
     //set the valid data for the happy path
     beforeEach(async () => {
       const user = new User({
-        age: 19,
+        dob: "01/01/2000",
         fullname: "abcdef",
         phone: "1111111111",
         gender: "female",
@@ -216,7 +216,7 @@ describe("/api/users", () => {
     //set the valid data for the happy path
     beforeEach(async () => {
       testUser = {
-        age: 19,
+        dob: "01/01/2000",
         fullname: "abcdef",
         phone: "1111111111",
         gender: "female",
@@ -280,7 +280,7 @@ describe("/api/users", () => {
         .put("/api/users/")
         .set("x-auth-token", token)
         .field("fullname", testUser.fullname)
-        .field("age", testUser.age)
+        .field("dob", testUser.dob)
         .field("phone", testUser.phone)
         .field("gender", testUser.gender)
         .attach("avatar", testUser.avatar);
@@ -289,7 +289,7 @@ describe("/api/users", () => {
     //set the valid data for the happy path
     beforeEach(async () => {
       testUser = {
-        age: 19,
+        dob: "02/01/2000",
         fullname: "abcdef",
         phone: "1111111111",
         gender: "female",
@@ -297,7 +297,7 @@ describe("/api/users", () => {
       };
 
       user = new User({
-        age: 20,
+        dob: "01/01/2000",
         fullname: "ghijklm",
         phone: "2222222222",
         gender: "male",
@@ -320,8 +320,14 @@ describe("/api/users", () => {
       expect(res.status).toBe(401);
     });
 
+    it("should return 403 if account not user", async () => {
+      token = new Account({}).generateAuthToken();
+      const res = await exec();
+      expect(res.status).toBe(403);
+    });
+
     it("should return 400 if body of request is invalid", async () => {
-      testUser.age = 0;
+      testUser.dob = "";
       testUser.fullname = "";
       testUser.gender = "";
       testUser.phone = "";
@@ -331,7 +337,9 @@ describe("/api/users", () => {
     });
 
     it("should return 404 if account._id in jwt token of request is not found", async () => {
-      token = new Account({}).generateAuthToken();
+      token = new Account({
+        user: mongoose.Types.ObjectId(),
+      }).generateAuthToken();
       const res = await exec();
       expect(res.status).toBe(404);
       expect(res.text).toBe("Account is not found");
@@ -356,7 +364,7 @@ describe("/api/users", () => {
       expect(userInDb).toHaveProperty("fullname", testUser.fullname);
       expect(userInDb).toHaveProperty("phone", testUser.phone);
       expect(userInDb).toHaveProperty("gender", testUser.gender);
-      expect(userInDb).toHaveProperty("age", testUser.age);
+      expect(userInDb).toHaveProperty("dob", testUser.dob);
     });
   });
 });

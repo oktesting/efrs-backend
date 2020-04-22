@@ -5,7 +5,7 @@ const { Account } = require("../models/account");
 const { Supervisor, validateSupervisor } = require("../models/supervisor");
 const validate = require("../middleware/validate");
 const auth = require("../middleware/auth");
-const { isAdmin } = require("../middleware/getRole");
+const { isAdmin, isSupervisor } = require("../middleware/getRole");
 const express = require("express");
 const router = express.Router();
 
@@ -76,7 +76,7 @@ router.post("/", [auth, validate(validateSupervisor)], async (req, res) => {
 //update supervisor
 router.put(
   "/",
-  [auth, single("avatar"), validate(validateSupervisor)],
+  [auth, isSupervisor, single("avatar"), validate(validateSupervisor)],
   async (req, res) => {
     let account = await Account.findById(req.account._id);
     if (!account) return res.status(404).send("Account is not found");

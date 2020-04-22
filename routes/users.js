@@ -3,7 +3,7 @@ const validate = require("../middleware/validate");
 const { single } = require("../services/uploadToServer");
 const { uploadAvatar } = require("../services/uploadToS3");
 const auth = require("../middleware/auth");
-const { isSupervisor } = require("../middleware/getRole");
+const { isSupervisor, isUser } = require("../middleware/getRole");
 const { Account } = require("../models/account");
 const { User, validateUser } = require("../models/user");
 const express = require("express");
@@ -54,7 +54,7 @@ router.post("/", [auth, validate(validateUser)], async (req, res) => {
   const user = User({
     fullname: req.body.fullname,
     phone: req.body.phone,
-    age: req.body.age,
+    dob: req.body.dob,
     gender: req.body.gender,
   });
 
@@ -77,7 +77,7 @@ router.post("/", [auth, validate(validateUser)], async (req, res) => {
 //update user
 router.put(
   "/",
-  [auth, single("avatar"), validate(validateUser)],
+  [auth, isUser, single("avatar"), validate(validateUser)],
   async (req, res) => {
     let account = await Account.findById(req.account._id);
     if (!account) return res.status(404).send("Account is not found");
@@ -86,7 +86,7 @@ router.put(
     const data = {
       fullname: req.body.fullname,
       phone: req.body.phone,
-      age: req.body.age,
+      dob: req.body.dob,
       gender: req.body.gender,
     };
     if (req.file) data["avatar"] = uploadAvatar(req.file, user);

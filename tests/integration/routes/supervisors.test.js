@@ -328,6 +328,12 @@ describe("/api/supervisors", () => {
       expect(res.status).toBe(401);
     });
 
+    it("should return 403 if account not supervisor", async () => {
+      token = new Account({}).generateAuthToken();
+      const res = await exec();
+      expect(res.status).toBe(403);
+    });
+
     it("should return 400 if body of request in invalid", async () => {
       testSuper.fullname = "";
       testSuper.location = "";
@@ -338,7 +344,9 @@ describe("/api/supervisors", () => {
     });
 
     it("should return 404 if account._id in jwt token of request is not found", async () => {
-      token = new Account({}).generateAuthToken();
+      token = new Account({
+        supervisor: mongoose.Types.ObjectId(),
+      }).generateAuthToken();
       const res = await exec();
       expect(res.status).toBe(404);
       expect(res.text).toBe("Account is not found");

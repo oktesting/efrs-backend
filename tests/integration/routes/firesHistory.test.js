@@ -36,7 +36,7 @@ describe("/api/fires-history", () => {
       const user = new User({
         fullname: "abcdef",
         phone: "0000000000",
-        age: 19,
+        dob: "01/01/2000",
         gender: "male",
       });
       await user.save();
@@ -103,7 +103,7 @@ describe("/api/fires-history", () => {
       const user = new User({
         fullname: "abcdef",
         phone: "0000000000",
-        age: 19,
+        dob: "01/01/2000",
         gender: "male",
       });
       await user.save();

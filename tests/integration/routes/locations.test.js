@@ -50,7 +50,7 @@ describe("/api/locations", () => {
       const user = new User({
         fullname: "abcdef",
         phone: "0000000000",
-        age: 19,
+        dob: "01/01/2000",
         gender: "male",
         locations: [locationId],
       });
@@ -117,7 +117,7 @@ describe("/api/locations", () => {
       const user = new User({
         fullname: "abcdef",
         phone: "0000000000",
-        age: 19,
+        dob: "01/01/2000",
         gender: "male",
       });
       await user.save();
