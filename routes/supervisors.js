@@ -1,5 +1,5 @@
 const valdidateObjectId = require("../middleware/validateObjectId");
-const { single } = require("../services/uploadToServer");
+const { single } = require("../middleware/uploadToServer");
 const { uploadAvatar } = require("../services/uploadToS3");
 const { Account } = require("../models/account");
 const { Supervisor, validateSupervisor } = require("../models/supervisor");

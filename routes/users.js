@@ -1,6 +1,6 @@
 const valdidateObjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validate");
-const { single } = require("../services/uploadToServer");
+const { single } = require("../middleware/uploadToServer");
 const { uploadAvatar } = require("../services/uploadToS3");
 const auth = require("../middleware/auth");
 const { isSupervisor, isUser } = require("../middleware/getRole");

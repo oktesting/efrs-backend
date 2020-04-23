@@ -6,7 +6,7 @@ const {
   addEvidencesToCurrentAlert,
 } = require("../middleware/handleAlert");
 const validate = require("../middleware/validate");
-const { array } = require("../services/uploadToServer");
+const { array } = require("../middleware/uploadToServer");
 const validateObjectId = require("../middleware/validateObjectId");
 const auth = require("../middleware/auth");
 const { isSupervisor, isUser } = require("../middleware/getRole");

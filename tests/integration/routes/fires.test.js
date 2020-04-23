@@ -5,7 +5,7 @@ const { Account } = require("../../../models/account");
 const { User } = require("../../../models/user");
 let server;
 
-describe("/api/accounts", () => {
+describe("/api/fires", () => {
   //init server berfore test
   beforeEach(() => {
     server = require("../../../index");
@@ -119,18 +119,6 @@ describe("/api/accounts", () => {
       });
       await fire.save();
       fireId = fire._id;
-    });
-
-    it("should return 401 if not logged in", async () => {
-      token = "";
-      const res = await exec();
-      expect(res.status).toBe(401);
-    });
-
-    it("should return 403 if account not supervisor", async () => {
-      token = new Account({}).generateAuthToken();
-      const res = await exec();
-      expect(res.status).toBe(403);
     });
 
     // it("should return 200 with list of fire with status pending and processing in db", async () => {
