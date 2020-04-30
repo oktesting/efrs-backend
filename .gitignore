@@ -7,6 +7,3 @@
 #logfile
 /logfile.log
 /uncaughtExceptions.log
-
-#file uploads
-/uploads/*

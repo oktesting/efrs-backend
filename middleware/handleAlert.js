@@ -27,7 +27,7 @@ function closeConnection(response, clientId) {
   if (!response.finished) {
     response.end();
     clients = clients.filter((c) => c.id !== clientId);
-    console.log(`${clientId} Connection closed`);
+    // console.log(`${clientId} Connection closed`);
   }
 }
 
@@ -76,7 +76,7 @@ module.exports.handleAlert = async (req, res, next) => {
     res,
   };
   clients.push(newClient);
-  console.log(`${clientId} Connection opened`);
+  // console.log(`${clientId} Connection opened`);
 
   // When client closes connection we update the clients list
   // avoiding the disconnected one

@@ -8,6 +8,7 @@ const {
   validateFireStation,
 } = require("../models/location");
 const { User } = require("../models/user");
+const { Supervisor } = require("../models/supervisor");
 const express = require("express");
 const router = express.Router();
 
@@ -54,11 +55,14 @@ router.get("/:id", [auth, valdidateObjectId], async (req, res) => {
 });
 
 router.delete("/:id", [auth, valdidateObjectId], async (req, res) => {
-  const location = await Location.findByIdAndRemove(req.params.id, {
-    useFindAndModify: false,
-  });
+  const location = await Location.findById(req.params.id);
   if (!location) return res.status(404).send("Location is not found");
-  res.status(200).send("Location is deleted");
+
+  const supervisors = await Supervisor.find({ location: location._id });
+  if (supervisors.length === 0) {
+    await location.remove();
+    res.status(200).send("Location is deleted");
+  } else res.status(400).send("Location could not be delete");
 });
 
 module.exports = router;

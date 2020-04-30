@@ -7,37 +7,37 @@ const accountSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 5,
-    maxlength: 255
+    maxlength: 255,
   },
   email: {
     type: String,
     unique: true,
     required: true,
     maxlength: 255,
-    minlength: 5
+    minlength: 5,
   },
   password: {
     type: String,
     required: true,
     maxlength: 1024, //after hashed
-    minlength: 5
+    minlength: 5,
   },
   isAdmin: Boolean,
   isVerified: {
     type: Boolean,
-    default: false
+    default: false,
   },
   supervisor: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Supervisor"
+    ref: "Supervisor",
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
-  }
+    ref: "User",
+  },
 });
 //adding an INSTANCE method to the class Account
-accountSchema.methods.generateAuthToken = function() {
+accountSchema.methods.generateAuthToken = function () {
   //cannot use '=>' here bc of 'this._id'
   return jwt.sign(
     {
@@ -46,28 +46,21 @@ accountSchema.methods.generateAuthToken = function() {
       email: this.email,
       name: this.name,
       supervisor: this.supervisor,
-      user: this.user
+      user: this.user,
     },
     config.get("jwtPrivateKey")
+    // {
+    //   expiresIn: "3h", // expires in 3 hours
+    // }
   );
 };
 
 module.exports.Account = mongoose.model("Account", accountSchema);
-module.exports.validateAccount = account => {
+module.exports.validateAccount = (account) => {
   const schema = {
-    name: Joi.string()
-      .min(5)
-      .max(255)
-      .required(),
-    email: Joi.string()
-      .min(5)
-      .max(255)
-      .email()
-      .required(),
-    password: Joi.string()
-      .min(5)
-      .max(255)
-      .required()
+    name: Joi.string().min(5).max(255).required(),
+    email: Joi.string().min(5).max(255).email().required(),
+    password: Joi.string().min(5).max(255).required(),
   };
   return Joi.validate(account, schema);
 };
