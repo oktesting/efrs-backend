@@ -44,7 +44,7 @@ module.exports.sendResetPasswordMail = async (account) => {
     subject: "Account Reset Password Token",
     text:
       "Hello,\n\n" +
-      "Please reset your account's password by clicking the link: \nhttp://" +
+      "Please reset your account's password by clicking the link: \nhttps://" +
       //url của trang front end đảm nhận form reset mk
       config.get("frontend_url") +
       "/reset-password/" +

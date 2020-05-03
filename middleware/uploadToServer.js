@@ -11,7 +11,7 @@ const storage = multer.memoryStorage();
 //   }
 // });
 
-const fileFilter = function(req, file, cb) {
+const fileFilter = function (req, file, cb) {
   if (
     file.mimetype === "image/jpeg" ||
     file.mimetype === "image/png" ||
@@ -26,12 +26,12 @@ const fileFilter = function(req, file, cb) {
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 1024 * 1024 * 16
+    fileSize: 1024 * 1024 * 30,
   },
-  fileFilter: fileFilter
+  fileFilter: fileFilter,
 });
 
-module.exports.single = name => {
+module.exports.single = (name) => {
   return upload.single(name);
 };
 
