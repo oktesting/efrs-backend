@@ -32,7 +32,7 @@ function closeConnection(response, clientId) {
 }
 
 module.exports.addAlert = async (req, res, next) => {
-  const fire = new Fire(req.body);
+  let fire = new Fire(req.body);
   addEvidencesToFire(req, fire);
   await fire.save();
   res.send({ _id: fire._id });
@@ -42,12 +42,15 @@ module.exports.addAlert = async (req, res, next) => {
 };
 
 module.exports.addEvidencesToCurrentAlert = async (req, res, next) => {
-  const fire = await Fire.findById(req.params.id);
+  let fire = await Fire.findById(req.params.id);
   if (!fire) return res.status(404).send("Fire is not found");
   if (fire.status === "finished")
     return res.status(400).send("Fire is already finished");
   addEvidencesToFire(req, fire);
-  sendEventsToAll(await fire.save());
+  await fire.save();
+  sendEventsToAll(
+    await Fire.findById(fire._id).populate("user", "-__v").select("-__v")
+  );
   return res.status(200).send("Evidences is submitted");
 };
 
