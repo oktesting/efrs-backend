@@ -7,3 +7,5 @@
 #logfile
 /logfile.log
 /uncaughtExceptions.log
+
+/config
