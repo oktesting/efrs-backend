@@ -48,7 +48,7 @@ accountSchema.methods.generateAuthToken = function () {
       supervisor: this.supervisor,
       user: this.user,
     },
-    config.get("jwtPrivateKey")
+    process.env.JWT_PRIVATE_KEY
     // {
     //   expiresIn: "3h", // expires in 3 hours
     // }

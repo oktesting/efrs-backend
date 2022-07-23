@@ -20,14 +20,19 @@ module.exports = function(app) {
 
   //api
   app.use("/api/fires", fires);
-  app.use("/api/supervisors", supervisors);
-  app.use("/api/users", users);
-  app.use("/api/accounts", accounts);
-  app.use("/api/auth", auth);
-  app.use("/api/locations", locations);
-  app.use("/api/emergency-alerts", emergencyAlerts);
-  app.use("/api/fires-history", firesHisotry);
-  app.use("/api/reports", reports);
+  // app.use("/api/supervisors", supervisors);
+  // app.use("/api/users", users);
+  // app.use("/api/accounts", accounts);
+  // app.use("/api/auth", auth);
+  // app.use("/api/locations", locations);
+  // app.use("/api/emergency-alerts", emergencyAlerts);
+  // app.use("/api/fires-history", firesHisotry);
+  // app.use("/api/reports", reports);
+
+  app.use(
+    '/ping',
+    express.Router().get('/', (req, res) => res.status(200).send('pong'))
+  );
 
   app.use(error); //handle error after all above middleware
 };

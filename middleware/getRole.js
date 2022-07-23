@@ -1,9 +1,8 @@
 //check whether the authenticated client is authorized (isAdmin: true)
-const config = require("config");
 
 module.exports.isAdmin = function(req, res, next) {
   //disable "requiresAuth" to bybass the authentication
-  // if (!config.get("requiresAuth")) return next();
+  // if (!process.env.requiresAuth) return next();
   if (!req.account.isAdmin) {
     //401 unauthorized
     //403 authorized but the asset is FORBIDDEN

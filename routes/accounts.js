@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const _ = require("lodash"); //provide utilities for manipulationg object
 const express = require("express");
 const Joi = require("joi");
@@ -8,8 +8,8 @@ const validate = require("../middleware/validate");
 const auth = require("../middleware/auth");
 const { isAdmin } = require("../middleware/getRole");
 const {
-  sendConfirmationEmail,
-  sendResetPasswordMail,
+  // sendConfirmationEmail,
+  // sendResetPasswordMail,
 } = require("../services/sendEmail");
 const { Token } = require("../models/token");
 
@@ -37,7 +37,7 @@ router.post("/", validate(validateAccount), async (req, res) => {
   const salt = await bcrypt.genSalt();
   account.password = await bcrypt.hash(account.password, salt);
   await account.save();
-  sendConfirmationEmail(account);
+  // sendConfirmationEmail(account);
   // const jwtToken = account.generateAuthToken();
   return res.status(200).send(account._id);
   // res
@@ -67,7 +67,7 @@ router.get("/resend/:id", validateOjectId, async (req, res) => {
   if (!account) return res.status(404).send("Account is not found");
   if (account.isVerified)
     return res.status(400).send("Account is already verified");
-  sendConfirmationEmail(account);
+  // sendConfirmationEmail(account);
   return res.status(200).send("An verification email is sent to your email");
 });
 
@@ -76,7 +76,7 @@ router.post("/forgot-password", async (req, res) => {
   if (!req.body.email) return res.status(400).send("Email must be provided");
   const account = await Account.findOne({ email: req.body.email });
   if (!account) return res.status(404).send("account is not found");
-  sendResetPasswordMail(account);
+  // sendResetPasswordMail(account);
   return res.status(200).send("Reset password email is sent to your email");
 });
 

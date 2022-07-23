@@ -6,8 +6,8 @@ const { Token } = require("../models/token");
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
-    user: config.get("email_user"),
-    pass: config.get("email_pass"),
+    user: process.env.email_user,
+    pass: process.env.email_pass,
   },
 });
 
@@ -24,7 +24,7 @@ module.exports.sendConfirmationEmail = async (account) => {
     text:
       "Hello,\n\n" +
       "Please verify your account by clicking the link: \nhttp://" +
-      config.get("base_url") +
+      process.env.BASE_URL +
       "/api/accounts/confirmation/" +
       confirmationToken.token +
       "\nThis token will be expires in one hours",
@@ -46,7 +46,7 @@ module.exports.sendResetPasswordMail = async (account) => {
       "Hello,\n\n" +
       "Please reset your account's password by clicking the link: \nhttps://" +
       //url của trang front end đảm nhận form reset mk
-      config.get("frontend_url") +
+      process.env.FRONTEND_URL +
       "/reset-password/" +
       resetToken.token +
       "\nThis token will be expires in one hours",

@@ -1,14 +1,14 @@
-const AWS = require("aws-sdk");
+/* const AWS = require("aws-sdk");
 const config = require("config");
 
-const ID = config.get("aws_id");
-const SECRET = config.get("aws_secret");
+const ID = process.env.aws_id;
+const SECRET = process.env.aws_secret;
 // The name of the bucket that you have created
-const BUCKET_NAME = config.get("aws_bucket_name");
+const BUCKET_NAME = process.env.aws_bucket_name;
 const s3 = new AWS.S3({
   accessKeyId: ID,
   secretAccessKey: SECRET
-});
+}); */
 
 module.exports.uploadAvatar = (avatar, user) => {
   const key = `avatar/${user._id}/${avatar.originalname}`;
@@ -24,7 +24,8 @@ module.exports.uploadEvidence = (evidence, fire) => {
 };
 
 function uploadFile(key, file) {
-  const params = {
+  // TODO: change upload file to server uploads folder or in mongodb
+  /* const params = {
     Bucket: BUCKET_NAME,
     Key: key, // File name you want to save as in S3
     Body: file.buffer,
@@ -39,7 +40,5 @@ function uploadFile(key, file) {
     }
     // console.log(`file is uploaded to ${data.Location}`);
   });
-  return `https://efrs.s3.${config.get(
-    "aws_bucket_region"
-  )}.amazonaws.com/${key}`;
+  return `https://efrs.s3.${process.env.aws_bucket_region}.amazonaws.com/${key}`; */
 }
