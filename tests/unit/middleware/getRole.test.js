@@ -1,5 +1,4 @@
 //check whether the authenticated client is authorized (isAdmin: true)
-const config = require("config");
 const { Account } = require("../../../models/account");
 const auth = require("../../../middleware/auth");
 const mongoose = require("mongoose");

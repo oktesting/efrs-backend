@@ -1,5 +1,4 @@
 /* const AWS = require("aws-sdk");
-const config = require("config");
 
 const ID = process.env.aws_id;
 const SECRET = process.env.aws_secret;

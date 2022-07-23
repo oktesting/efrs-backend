@@ -1,6 +1,5 @@
 const { Account } = require("../../../models/account");
 const jwt = require("jsonwebtoken");
-const config = require("config");
 const mongoose = require("mongoose");
 
 describe("user.generateAuthToken", () => {

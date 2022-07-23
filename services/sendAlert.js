@@ -1,5 +1,4 @@
 const gcm = require("node-gcm");
-const config = require("config");
 
 module.exports.sendAlert = async (alert, registrationTokens) => {
   // ... or some given values

@@ -1,12 +1,10 @@
 const winston = require('winston');
 const express = require('express');
-const config = require('config');
 require('dotenv').config();
 
 const app = express();
 
 require('./startup/logging')();
-// require('./startup/config')();
 require('./startup/cors')(app);
 require('./startup/routes')(app);
 // require('./startup/db')();

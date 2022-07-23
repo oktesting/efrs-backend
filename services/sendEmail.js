@@ -1,6 +1,5 @@
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
-const config = require("config");
 const { Token } = require("../models/token");
 
 const transporter = nodemailer.createTransport({
