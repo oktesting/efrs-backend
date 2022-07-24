@@ -1,34 +1,22 @@
-const valdidateObjectId = require("../middleware/validateObjectId");
-const validate = require("../middleware/validate");
-const auth = require("../middleware/auth");
-const { isSupervisor } = require("../middleware/getRole");
-const {
-  EmergencyAlert,
-  validateEmergencyAlert,
-} = require("../models/emergencyAlert");
-const { Location } = require("../models/location");
-const { sendAlert } = require("../services/sendAlert");
-const express = require("express");
-const router = express.Router();
+const { EmergencyAlert } = require('../models/emergencyAlert');
+const { Location } = require('../models/location');
+const { sendAlert } = require('../utils/sendAlert');
 
-//post new emergency alert
-router.post(
-  "/",
-  [auth, isSupervisor, validate(validateEmergencyAlert)],
-  async (req, res) => {
+module.exports = {
+  issueAlert: async (req, res) => {
     const alert = EmergencyAlert({
       radius: req.body.radius,
       lat: req.body.lat,
       lng: req.body.lng,
       message: req.body.message,
       title: req.body.title,
-      supervisor: req.body.supervisor,
+      supervisor: req.body.supervisor
     });
     await alert.save();
     //get all locations in db except fire station and location without device
     const locations = await Location.find({
       isFireStation: false,
-      device: { $ne: null },
+      device: { $ne: null }
     });
 
     //get all location within the range
@@ -55,7 +43,7 @@ router.post(
 
     return res.status(200).send(filteredLocations);
   }
-);
+};
 
 function getDistanceFrom2CoordinatesInKm(lat1, lng1, lat2, lng2) {
   const R = 6371; // Radius of the earth in km
@@ -75,5 +63,3 @@ function getDistanceFrom2CoordinatesInKm(lat1, lng1, lat2, lng2) {
 function deg2rad(deg) {
   return deg * (Math.PI / 180);
 }
-
-module.exports = router;

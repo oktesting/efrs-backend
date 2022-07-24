@@ -1,0 +1,82 @@
+const { uploadAvatar } = require('../utils/uploadToS3');
+const { Account } = require('../models/account');
+const { Supervisor } = require('../models/supervisor');
+
+module.exports = {
+  getSupervisors: async (req, res) => {
+    const accounts = await Account.find()
+      .populate('supervisor', '-__v')
+      .select('-__v -password');
+    return res
+      .status(200)
+      .send(
+        accounts.filter((acc) => acc.supervisor !== undefined && acc.supervisor !== null)
+      );
+  },
+  getSupervisor: async (req, res) => {
+    const acc = await Account.findById(req.params.id)
+      .populate('supervisor', '-__v')
+      .select('-__v -password');
+
+    if (!acc || acc.supervisor === undefined || acc.supervisor === null)
+      return res.status(404).send('Supervisor is not found');
+    return res.status(200).send(acc);
+  },
+  changeActivation: async (req, res) => {
+    const supervisor = await Supervisor.findById(req.params.id);
+    if (!supervisor) return res.status(404).send('Supervisor is not found');
+    supervisor.isActivated = !supervisor.isActivated;
+    await supervisor.save();
+    return res.status(200).send('Supervisor activation is changed');
+  },
+  create: async (req, res) => {
+    let account = await Account.findById(req.account._id);
+    if (!account) return res.status(404).send('Account is not found');
+    if (account.supervisor)
+      return res.status(400).send('This account is already registered');
+
+    //create supervisor profile
+    const supervisor = Supervisor(req.body);
+    //set account to associate to an supervisor profile
+    account.supervisor = supervisor._id;
+    await account.save();
+    await supervisor.save();
+    account['supervisor'] = await Supervisor.findById(supervisor._id).populate(
+      'location'
+    );
+    const token = account.generateAuthToken();
+    return (
+      res
+        .header('x-auth-token', token)
+        //allow client to read the jwt in header
+        .header('access-control-expose-headers', 'x-auth-token')
+        .send('Supervisor is created')
+    );
+  },
+  update: async (req, res) => {
+    let account = await Account.findById(req.account._id);
+    if (!account) return res.status(404).send('Account is not found');
+    let supervisor = await Supervisor.findById(req.account.supervisor._id);
+    if (!supervisor) return res.status(404).send('Supervisor is not found');
+    const data = {
+      location: req.body.location,
+      fullname: req.body.fullname,
+      phone: req.body.phone,
+      gender: req.body.gender
+    };
+    if (req.file) data['avatar'] = uploadAvatar(req.file, supervisor);
+    supervisor = await Supervisor.findByIdAndUpdate(req.account.supervisor._id, data, {
+      new: true,
+      useFindAndModify: false
+    }).populate('location');
+    account['supervisor'] = supervisor;
+    const token = account.generateAuthToken();
+    return (
+      res
+        .header('x-auth-token', token)
+        //allow client to read the jwt in header
+        .header('access-control-expose-headers', 'x-auth-token')
+        .send('Supervisor is edited')
+    );
+  }
+};

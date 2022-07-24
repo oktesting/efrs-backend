@@ -1,39 +1,39 @@
-const jwt = require("jsonwebtoken");
-const Joi = require("joi");
-const mongoose = require("mongoose");
+const jwt = require('jsonwebtoken');
+const Joi = require('joi');
+const mongoose = require('mongoose');
 const accountSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
     minlength: 5,
-    maxlength: 255,
+    maxlength: 255
   },
   email: {
     type: String,
     unique: true,
     required: true,
     maxlength: 255,
-    minlength: 5,
+    minlength: 5
   },
   password: {
     type: String,
     required: true,
     maxlength: 1024, //after hashed
-    minlength: 5,
+    minlength: 5
   },
   isAdmin: Boolean,
   isVerified: {
     type: Boolean,
-    default: false,
+    default: false
   },
   supervisor: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Supervisor",
+    ref: 'Supervisor'
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
+    ref: 'User'
+  }
 });
 //adding an INSTANCE method to the class Account
 accountSchema.methods.generateAuthToken = function () {
@@ -45,7 +45,7 @@ accountSchema.methods.generateAuthToken = function () {
       email: this.email,
       name: this.name,
       supervisor: this.supervisor,
-      user: this.user,
+      user: this.user
     },
     process.env.JWT_PRIVATE_KEY
     // {
@@ -54,12 +54,26 @@ accountSchema.methods.generateAuthToken = function () {
   );
 };
 
-module.exports.Account = mongoose.model("Account", accountSchema);
+module.exports.Account = mongoose.model('Account', accountSchema);
 module.exports.validateAccount = (account) => {
   const schema = {
     name: Joi.string().min(5).max(255).required(),
     email: Joi.string().min(5).max(255).email().required(),
-    password: Joi.string().min(5).max(255).required(),
+    password: Joi.string().min(5).max(255).required()
   };
   return Joi.validate(account, schema);
+};
+module.exports.validateResetPassword = (payload) => {
+  const schema = {
+    newPassword: Joi.string().min(5).max(255).required(),
+    token: Joi.string().length(32).required()
+  };
+  return Joi.validate(payload, schema);
+};
+module.exports.validateAuthentication = (payload) => {
+  const schema = {
+    email: Joi.string().min(5).max(255).email().required(),
+    password: Joi.string().min(5).max(255).required()
+  };
+  return Joi.validate(payload, schema);
 };
